@@ -1,5 +1,4 @@
 import React,{Component} from 'react'
-import { Field, reduxForm } from 'redux-form'
 import {connect} from 'react-redux';
 import {signInAction} from '../actions/index'
 
@@ -29,7 +28,7 @@ class Signin extends Component{
         username:this.state.username,
         password:this.state.password
       }
-      this.props.signInAction(values,this.props.history);
+      this.props.dispatch(signInAction(values,this.props.history));
   }
 
   errorMessage() {
@@ -42,6 +41,21 @@ class Signin extends Component{
   }
 }
 
+  debugger(){
+    if(this.props.authenticated){
+      return(
+        <div className="info-red">true
+        </div>
+      )
+    }
+    else{
+      return(
+        <div className="info-red">False
+        </div>
+      )
+    }
+  }
+
   render(){
     return(
       <div>
@@ -49,13 +63,14 @@ class Signin extends Component{
                 <h2 className="form-signin-heading"> Please sign in </h2>
                 <label className="sr-only"> Email address
                 </label>
-                <input value={this.state.email} id="inputEmail" onChange={this.handleEmailChange} className="form-control" placeholder="Email address" required  />
+                <input value={this.state.email} id="inputEmail" onChange={this.handleEmailChange} className="form-control" placeholder="Username" required  />
                 <label className="sr-only"> Password</label>
                 <input value={this.state.password} id="inputPassword" onChange={this.handlePasswordChange} className="form-control" placeholder="Password" required />
                 <button className="btn btn-lg btn-primary btn-block" type="submit"> Sign in
                 </button>
       </form>
       {this.errorMessage()}
+      {this.debugger()}
       </div>
     );
   }
@@ -63,7 +78,8 @@ class Signin extends Component{
 
 
 function mapStateToProps(state) {
-  return { errorMessage: state.auth.error };
+  return { errorMessage: state.auth.error,
+            authenticated:state.auth.authenticated};
 }
 
-export default connect(null,{signInAction})(Signin)
+export default connect(mapStateToProps,{signInAction})(Signin)
