@@ -20,8 +20,6 @@ module.exports = app => {
     console.log("login");
   });
 
-  
-
   //add friend
   app.post("/addfriend", function(req, res) {
     var send_id = req.body.send_id;
@@ -40,7 +38,6 @@ module.exports = app => {
       res.send("success");
     });
   });
-
 
   //query on loged in user to check recived requests
   app.get("/friendrequests/:_id", function(req, res) {
@@ -72,7 +69,6 @@ module.exports = app => {
     Friend.getFriendRequest(id, id1, function(err, result) {
       if (err) throw err;
       var required_id = result[0]._id;
-      console.log("");
       var myquery = { _id: required_id };
 
       Friend.deleteOne(myquery, function(err, obj) {
@@ -111,36 +107,55 @@ module.exports = app => {
   });
 
   //post creation
-  app.post(
-    "/createpost",
-    passport.authenticate("jwt", { session: false }),
-    (req, res, next) => {
-      var newPost = new Post({
-        user_id: req.user.id,
-        postContent: req.body.content
-      });
+  app.post("/createpost/:_id", (req, res, next) => {
+    var newPost = new Post({
+      user_id: req.params._id,
+      postContent: req.body.content
+    });
 
-      Post.CreatePost(newPost, (err, post) => {
-        if (err) throw error;
-      });
-      return res.status(200).send();
-    }
-  );
+    Post.CreatePost(newPost, (err, post) => {
+      if (err) throw error;
+    });
+    return res.status(200).send();
+  });
 
-  app.get(
-    "/getpost",
-    passport.authenticate("jwt", { session: false }),
-    (req, res, next) => {
-      console.log(req.user._id);
-      Post.getPosts(req.user._id, (err, post) => {
-        if (err) throw err;
-        if (post) {
-          console.log(post);
-        }
+  app.get("/");
+
+  app.get("/getpost/:_id", (req, res, next) => {
+    var curr_id = req.params._id;
+    Post.getPosts(curr_id, (err, post) => {
+      if (err) throw err;
+      if (post) {
+        console.log(post);
+      }
+    });
+    return res.status(200).send();
+  });
+
+  app.get("/user/feed/:_id", (req, res) => {
+    var loged_id = req.params._id;
+    User.getUserById(loged_id, (err, user) => {
+      var total = [{}];
+      if (err) throw err;
+
+      var i = 0;
+      user.friends.forEach(value => {
+        Post.getPosts(value, (err, result) => {
+          i = i + 1;
+          if (err) throw err;
+          if (result.length > 0) {
+            console.log(result);
+            if (total.length == 0) {
+              total = result;
+            } else {
+              total = total.concat(result);
+            }
+          }
+          if (i == user.friends.length) res.send(total);
+        });
       });
-      return res.status(200).send();
-    }
-  );
+    });
+  });
 
   //profile
   app.get(
@@ -155,6 +170,22 @@ module.exports = app => {
       });
     }
   );
+  //registering the user
+  app.post("/register", function(req, res) {
+    var newUser = new User({
+      name: req.body.name,
+      email: req.body.email,
+      username: req.body.username,
+      password: req.body.password
+    });
+
+    User.createUser(newUser, function(err, user) {
+      if (err) throw err;
+
+      j = user.id;
+    });
+    return res.status(200).send();
+  });
 
   //login the user
   app.post("/authenticate", (req, res, next) => {
@@ -189,21 +220,6 @@ module.exports = app => {
       });
     });
   });
-
-  //registering the user
-  app.post("/register", function(req, res) {
-    var newUser = new User({
-      name: req.body.name,
-      email: req.body.email,
-      username: req.body.username,
-      password: req.body.password
-    });
-
-    User.createUser(newUser, function(err, user) {
-      if (err) throw err;
-
-      j = user.id;
-    });
-    return res.status(200).send();
-  });
 };
+
+//    passport.authenticate("jwt", { session: false }),
