@@ -4,7 +4,7 @@ import SignIn from './Login'
 import SignUp from './Register'
 import noAuth from './hoc/no_auth'
 import requireAuth from './hoc/require_auth'
-import Secret from './secret';
+import UserFeed from './userfeed';
 
 
 class App extends Component{
@@ -14,7 +14,7 @@ class App extends Component{
     <div>
       <Route path="/signin" component={noAuth(SignIn)} />
       <Route path="/signup" component={noAuth(SignUp)}/>
-      <Route path="/secret" component={requireAuth(Secret)}/>
+      <Route path="/secret" component={requireAuth(UserFeed)}/>
     </div>
     </BrowserRouter>
   );

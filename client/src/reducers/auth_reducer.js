@@ -4,8 +4,7 @@ import {
   AUTHENTICATION_ERROR
 } from "../actions";
 
-export default function(state = {}, action) {
-  console.log(action);
+export default function(state={}, action) {
   switch (action.type) {
     case AUTHENTICATED:
       return { ...state, authenticated: true };

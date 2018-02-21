@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const keys = require("../config/keys");
 const mongoose = require("mongoose");
 
+var j="vikas";
 module.exports = app => {
   app.get("/", function(req, res) {
     res.send(j);
@@ -106,6 +107,11 @@ module.exports = app => {
     });
   });
 
+  app.get('/',function(req,res)
+  {
+    res.send("hlo");
+  })
+
   //post creation
   app.post("/createpost/:_id", (req, res, next) => {
     var newPost = new Post({
@@ -165,13 +171,15 @@ module.exports = app => {
       res.json({
         user: {
           name: req.user.name,
-          email: req.user.email
+          email: req.user.email,
+          id:req.user._id
         }
       });
     }
   );
   //registering the user
   app.post("/register", function(req, res) {
+
     var newUser = new User({
       name: req.body.name,
       email: req.body.email,
@@ -179,6 +187,7 @@ module.exports = app => {
       password: req.body.password
     });
 
+    console.log(newUser);
     User.createUser(newUser, function(err, user) {
       if (err) throw err;
 
@@ -204,9 +213,11 @@ module.exports = app => {
           const token = jwt.sign(user.toJSON(), keys.secret, {
             expiresIn: 604800
           });
+
+          console.log("JWT"+token);
           res.json({
             success: true,
-            token: "JWT" + token,
+            token: "JWT " + token,
             user: {
               id: user._id,
               name: user.name,
